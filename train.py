@@ -19,6 +19,7 @@ class Trainer:
 		self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 		if 'audio' in args.generate:
+			print(f"----------INPUT SIZE IS {args.cond_size+args.gen_size}")
 			self.model = CondRNN(args.cond_size+args.gen_size, args.hidden_size,
 								args.mulaw_channels, args.n_layers, self.device,
 								args.lr,paramonly=False,onehot=args.onehot,

@@ -70,7 +70,7 @@ def listDirectory_all(directory,fileExtList=None,topdown=True,regex=None):
 		fnameList.append(os.path.basename(directory)) 
 	return fileList , fnameList
 
-def check_duration(filelist,allsame=False):
+def check_duration(filelist,allsame=True):
 	"""use PySoundFile's info method to find the duration of all files in filelist
 	input params: allsame=True if you expect all durations to be the same, then routine will test this
 	returns: a list of all durations in filelist"""
