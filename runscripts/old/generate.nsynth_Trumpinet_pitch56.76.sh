@@ -10,16 +10,13 @@ DATAFOLDER="nsynth_Trumpinet_pitch56.76" #name of folder in DATAPATH where sound
 
 NLAYERS=4
 LAYERSIZE=256
-SEQ_LEN=512  
-TFR=0.9
+SEQ_LEN=256  
+TFR=0.95
 
 #This is where generate will look for the /model folder as well as the root for audio output
 # note hard-coded date to match the model folder name.
-OUTDIR=2021.07.03_${DATAFOLDER}"_NL${NLAYERS}.H${LAYERSIZE}.TFR.${TFR}.SL${SEQ_LEN}"
+OUTDIR=2021.06.29_${DATAFOLDER}"_NL${NLAYERS}.H${LAYERSIZE}.TFR.${TFR}.SL${SEQ_LEN}"
 
-#Copy this script to the output dir for posterity
-mkdir -p output/$OUTDIR
-cp "$0" output/$OUTDIR
 #--------------------------------------------------------------------------------------------------------
 # Now the generator-specific parameters
 
@@ -44,7 +41,7 @@ echo "ESR= $ESR"
 echo "OUTDIR = $OUTDIR"
 
 
-for STEP in 130000
+for STEP in 200000
 do
 
 
