@@ -1,24 +1,25 @@
 #!/bin/bash 
 # these scripts should be run from newMTCRNN and in the newsnn conda environment
 
-PROP="dim0 dim1"  #pitch, instID  - must correspond to names in the param files
+PROP="instID amplitude normPitch"  #pitch, instID  - must correspond to names in the param files
 cond_size=`echo $PROP | wc -w`
 echo "cond_size is $cond_size"
 DATAPATH="/mydata" # Docker sets "/scratch/lonce" to mydata  
-DATAFOLDER="nsynth_Trumpinet_pitch56.76" #name of folder in DATAPATH where sounds and parameters are
+#DATAFOLDER="nsynth_Trumpinet_pitch56.76" #name of folder in DATAPATH where sounds and parameters are
+DATAFOLDER="nsynth.64.76.dl"
 
 NLAYERS=4
 LAYERSIZE=256
 SEQ_LEN=512
 TFR=0.9
-OUTDIR=$(date +%Y.%m.%d)_${DATAFOLDER}"_NL${NLAYERS}.H${LAYERSIZE}.TFR.${TFR}.SL${SEQ_LEN}"
+OUTDIR=$(date +%Y.%m.%d)_${DATAFOLDER}"_NL${NLAYERS}.H${LAYERSIZE}.TFR.${TFR}.SL${SEQ_LEN}_test2"
 
 #Copy this script to the output dir for posterity
 mkdir -p output/$OUTDIR
 cp "$0" output/$OUTDIR
 
 
-NUMSTEPS=200000
+NUMSTEPS=100000
 CHKPOINT=10000
 
 #################   For continuing from checkpoint
