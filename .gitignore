@@ -22,3 +22,4 @@ cmd.txt
 /network/networks_old.py
 generate_old.py
 *.pdf
+/temp
