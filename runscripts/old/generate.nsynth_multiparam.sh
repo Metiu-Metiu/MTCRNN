@@ -49,7 +49,7 @@ do
 CPDIR=$FILE
 echo "CPDIR is  $CPDIR"
 
-for STEP in 20000 
+for STEP in 100000 
 do
 fname="$(basename -- $CPDIR .npy)"
 
@@ -63,8 +63,9 @@ echo "AUDIO_OUT = $AUDIO_OUT"
 --data_dir $DATAPATH/$DATAFOLDER --generate audio --prop $PROP --cond_size $cond_size --gen_size 1 --model_dir output/$MODELDIR/model \
 --step $STEP --paramvect external --sample_rate $SR --external_array $CPDIR \
 --external_sr $ESR --out $AUDIO_OUT \
---rand_prime \
 --save
+
+# --rand_prime \ 
 	#play $AUDIO_OUT.wav
 	echo "wrote audio file ${AUDIO_OUT}.wav"
 

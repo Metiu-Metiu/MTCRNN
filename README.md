@@ -4,6 +4,7 @@ A generative model for audio that is driven by conditioning at different timesca
 Before running, copy [paramManager](https://github.com/muhdhuz/paramManager) repository into the root of this repo.
 
 **Recommended project structure**  
+
 - `train.py`: Main script for training and saving model
 - `generate.py` : A script for generating with pre-trained model
 - /network
@@ -24,8 +25,10 @@ Before running, copy [paramManager](https://github.com/muhdhuz/paramManager) rep
 * [paramManager](https://github.com/muhdhuz/paramManager)
 * PySoundfile >= 0.9 for loading audio files
   
+
 **Authors**  
 * Muhammad Huzaifah
+* Lonce Wyse
 
 **Acknowledgement**
 * Organisation and functional structure generally inspired by [Golbin's WaveNet repo](https://github.com/golbin/WaveNet).
@@ -42,8 +45,6 @@ Each tier is an individual model that is trained independently. First decide whi
 List the generation parameters under **generate** and the corresponding number of input channels as **gen_size**. List the conditioning parameters under **prop** and the corresponding number of channels as **cond_size**. Specify the **sample_rate** for the tier. **data_dir** and **param_dir** point to the directory containing the data files and parameter files respectively. Models will be saved in **output_dir**. Please consult config file for more options and the below for some recipes to get started. 
 
 ## Training
-![Training](https://github.com/muhdhuz/MTCRNN/blob/master/figures/mtcrnn_training.png)
-
 **Training frame-level tier (parameters only)**  
 For the below teacher forcing rate (TFR) is held constant at 0.5 throughout training duration.  
 Tier 3:    
@@ -53,7 +54,7 @@ python3 train.py --hidden_size 300 --batch_size 16 --data_dir data/audio --param
 Tier 2:    
 ```bash
 python3 train.py --hidden_size 500 --batch_size 16 --data_dir data/audio --param_dir data/param --generate mfcc0 mfcc1 mfcc2 mfcc3 mfcc4 mfcc5 mfcc6 mfcc7 mfcc8 mfcc9 mfcc10 mfcc11 mfcc12 --prop rmse centroid pitch --gen_size 13 --cond_size 3 --output_dir tier2 --sample_rate 500 --seq_len 2000 --num_steps 6000 --checkpoint 2000 --tfr 0.5
-```  
+```
 
 **Training sample-level tier (audio + parameters)**  
 If unspecified, **generate** option defaults to "audio". Use **gen_size** 1 if output audio are mu-law encoded else number of mu-law channels (default: 256) if using **one-hot** option. Currently audio generation cannot be mixed with generation of other parameters but parameters can still be used as conditional inputs. If **ss** is supplied in addition to **tfr**, scheduled sampling is used, the TFR is linearly decreased over the training duration strating from **tfr** and ending at **ss**.    
@@ -76,11 +77,9 @@ Models are automatically saved according to the following naming convension: mod
 Tier 1:     
 ```bash
 python3 train.py --hidden_size 300 --batch_size 16 --data_dir data/audio --param_dir data/param --generate rmse centroid pitch --prop fill --gen_size 3 --cond_size 1 --output_dir tier3  --sample_rate 125 --seq_len 1000 --num_steps 4000 --checkpoint 1000 --model_dir tier3/model --step 2000
-``` 
+```
 
 ## Generate
-![Generate](https://github.com/muhdhuz/MTCRNN/blob/master/figures/mtcrnn_generation.png)
-
 Generation has 3 modes of conditioning given by **paramvect** option:  
 * *self* (default): taken from priming data file  
 * *external*: manually provide a numpy array of shape [batch,length,features]  
@@ -96,7 +95,7 @@ For conditioning from a specific file starting from a specific time (in sec) use
 If **data_dir** is given conditioning params are taken randomly from somewhere in the dataset. Instead if **seed** is provided the params are taken from the seed file starting from the time given by dataset or seed audio file. 
 ```bash
 python3 generate.py --hidden_size 300 --batch_size 1 --seq_len 1325 --length 1200 --param_dir data/param --generate rmse centroid pitch --prop fill --gen_size 3 --cond_size 1 --model_dir output/tier3/model --step 4000 --sample_rate 125 --paramvect self --save --seed data/audio/ZOOM0001.wav --seed_start 1.5
-```  
+```
 
 **Generate with external conditioning**  
 Below case will output synthesized audio, using mfcc{0-12} as a conditional control parameters. (seq_len-length) samples are used for priming. Requires a trained model found in **model_dir** and defined by **step**. External conditioning requires additional keywords **external array** pointing to a saved numpy array .npy file containing the conditioning values and **external_sr**, the original sample rate for this set of conditional values. Values will be upsampled automatically from **external_sr** to **sample_rate**. Output filename given by **out**.        
@@ -112,11 +111,39 @@ python3 generate.py --hidden_size 300 --batch_size 1 --seq_len 1325 --length 120
 
 **Priming with random numbers**  
 For the above, priming is done with (seq_len-length) samples, either from **data_dir** or **seed**. If instead want to prime with random numbers add **rand_prime** keyword. If consistent random numbers are desired then also provide a random seed using **rand_seed**. The length for the random primer is still (seq_len-length) samples. 
+
 ```bash
 python3 generate.py --hidden_size 300 --batch_size 1 --seq_len 1325 --length 1200 --param_dir data/param --generate rmse centroid pitch --gen_size 3 --cond_size 0 --model_dir output/tier3/model --step 4000 --data_dir data/audio --paramvect none --sample_rate 125 --rand_prime --seed 14
 ```
 
 ## Architectures  
 Several different network architectures are provided with the code. These can be chosen with the **net** argument. For standard use only --net 0 is needed. If you are feeling adventurous feel free to try the other networks {1-5}. Network 6 is a legacy option for compatibility with old models. This option should NOT be used. Please consult config.py and network.py for descriptions of each network. There is also a **plstm** option to use [phased lstm](https://arxiv.org/abs/1610.09513) in place of gru. This works in principle but the optimum plstm parameters are unknown.
+
+## Docker  
+
+Perhaps the most reliable way to run this code is in a docker environment. The file for creating the environment is in the folder /docker. To create the image: 
+
+```bash
+docker image build --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) --file Dockerfile --tag foo:mtcrnn ../
+```
+
+Then to run a container from your ProjectDirectory:
+
+```
+docker run --ipc=host --gpus "device=0" -it -v $(pwd):/ProjectDirectory -v /path-to-your-data-folder:/mydata foo:mtcrnn
+```
+
+The  name '/mydata' will refer to the path-to-your-data-folder in the container, and is used in the runscript (see below).
+
+## genParams  
+
+The genParams/ folder has some notebooks that you can use to generate .npy files of conditioning parameters for controlling the RNN during generation. The runscript (see below) uses such files for generating audio. The files are just arrays of numbers, so your runscript (or generation code) must know how many there are and what they mean (which parameters in the metadata files they correspond to).
+
+## Runscript  
+
+runscripts/ run_tg.sh [-t, -g] for training and/or generating does just about everything for a basic run. Set the parameters you want in the script and run.
+
+
+
 
 
