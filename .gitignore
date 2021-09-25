@@ -16,7 +16,6 @@ codetest.ipynb
 cmd.txt
 !requirements.txt
 scratch/
-*.ipynb
 *.pbs
 /generated
 /network/networks_old.py
