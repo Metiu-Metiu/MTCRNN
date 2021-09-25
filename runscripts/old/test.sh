@@ -20,3 +20,6 @@ while getopts “::gt” opt; do
   esac
 done
 echo "GENERATING = $GENERATING, TRAINING=$TRAINING"
+
+DATESTAMP=`date +%Y.%m.%d`
+echo "datestamp is ${DATESTAMP}"

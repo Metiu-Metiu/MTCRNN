@@ -15,7 +15,7 @@ codetest.ipynb
 /npy_files
 cmd.txt
 !requirements.txt
-*.npy
+/scratch
 *.ipynb
 *.pbs
 /generated

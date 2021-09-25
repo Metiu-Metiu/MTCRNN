@@ -43,7 +43,7 @@ NUMSTEPS=40000
 CHKPOINT=5000
 
 # MODELDIR:  The ORIGINAL training MODELDIR date -  set manually if running generate without training 
-DATESTAMP=2021.09.21 #(date +%Y.%m.%d)
+DATESTAMP=2021.09.21 #  `date +%Y.%m.%d`
 MODELDIR=${DATESTAMP}_${DATAFOLDER}"_NL${NLAYERS}.H${LAYERSIZE}.TFR.${TFR}.SL${SEQ_LEN}.BATCHSIZE${BATCHSIZE}"
 
 
@@ -108,8 +108,8 @@ then
 	cp "$0" $GEN_OUT  # copy this script output directory for posterity
 
 
-	# directory of parameter files for this run
-	for FILE in scratch/${DESCRIPTION}/* 
+	# directory of parameter files for this run (npy files, see notebooks in genParams)
+	for FILE in genParams/run/${DESCRIPTION}/*  
 	do 
 		# An npy file with a cond_size array of parameter values to use for synthesis
 		CPDIR=$FILE
