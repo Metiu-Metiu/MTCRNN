@@ -38,8 +38,8 @@ SEQ_LEN=512
 TFR=0.9
 BATCHSIZE=128
 
-NUMSTEPS=40000
-CHKPOINT=10000
+NUMSTEPS=120000
+CHKPOINT=20000
 
 # MODELDIR:  The ORIGINAL training MODELDIR date
 	# -  set manually if running from checkpoint or generating without training 
@@ -63,7 +63,7 @@ then
 	python3 train.py --hidden_size $LAYERSIZE --batch_size $BATCHSIZE --param_dir $DATAPATH/$DATAFOLDER \
 	--prop $PROP --cond_size $cond_size --n_layers $NLAYERS --seq_len $SEQ_LEN --gen_size 1 --output_dir $MODELDIR \
 	--data_dir $DATAPATH/$DATAFOLDER --num_steps $NUMSTEPS --checkpoint $CHKPOINT \
-	--tfr $TFR 
+	--rand_prime --tfr $TFR 
 
 	# --model_dir $CHECKPOINTDIR --step $CHECKPOINTSTEP  #################   For continuing from checkpoint
 
@@ -88,7 +88,7 @@ then
 	let OUTSEQ_LEN=$LEN+1    #duration of output in samples (including the seed)
 
 	#GENSTEPS must be in the collection of checkpointed models (that include the number in their filenames).
-	GENSTEPS="30000 40000"  #"10000 20000 30000 40000" 
+	GENSTEPS="40000 80000 120000"  #"10000 20000 30000 40000" 
 
 	# the reference
 	let ESR=1000/$SECS       #the sample rate of the parameter array (original was 1000 samples in 1 sec)

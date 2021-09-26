@@ -36,9 +36,9 @@ NLAYERS=4
 LAYERSIZE=256
 SEQ_LEN=256
 TFR=0.9
-BATCHSIZE=64
+BATCHSIZE=128
 
-NUMSTEPS=30000
+NUMSTEPS=12000
 CHKPOINT=3000
 
 # MODELDIR:  The ORIGINAL training MODELDIR date
@@ -88,7 +88,7 @@ then
 	let OUTSEQ_LEN=$LEN+1    #duration of output in samples (including the seed)
 
 	#GENSTEPS must be in the collection of checkpointed models (that include the number in their filenames).
-	GENSTEPS="3000 9000 15000 30000" 
+	GENSTEPS="3000 6000 9000 12000" 
 
 	# the reference
 	let ESR=1000/$SECS       #the sample rate of the parameter array (original was 1000 samples in 1 sec)
@@ -126,10 +126,10 @@ then
 				python3 generate.py --hidden_size $LAYERSIZE --n_layers $NLAYERS --batch_size 1 --seq_len $OUTSEQ_LEN --length $LEN --param_dir $DATAPATH/$DATAFOLDER \
 			--data_dir $DATAPATH/$DATAFOLDER --generate audio --prop $PROP --cond_size $cond_size --gen_size 1 --model_dir output/$MODELDIR/model \
 			--step $STEP --paramvect external --sample_rate $SR --external_array $CPDIR \
-			--external_sr $ESR --out $AUDIO_OUT \
+			--external_sr $ESR --rand_prime --out $AUDIO_OUT \
 			--save
 
-			# --rand_prime \ 
+
 				#play $AUDIO_OUT.wav
 				echo "wrote audio file ${AUDIO_OUT}.wav"
 

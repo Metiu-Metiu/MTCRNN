@@ -1,6 +1,6 @@
 # Quick(ish) Start
 
-1. Create a dataset from [syntex.sonicthings.org](). Let's say you put in in /scratch/syntex/DS_TokWotalDuet_2.0/tokwotal_dataset
+1. There is a small dataset in Quickstart/.  Let's say you unzip it and put it in /scratch/QuickStart/RegularPopsRandomPitch_16k
 
 2. Install nvidia docker. To check:
 
@@ -8,7 +8,7 @@
    nvidia-docker version
    ```
 
-3. Next create you docker container for running the RNN. Navigate to the /docker folder and run:
+3. Next create you docker container for running the RNN. Navigate to the /docker folder. You may need to edit the 1st line of the Docker file to get a pytorch version compatible with your graphics card.  Then  run:
 
    ```
    docker image build --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) --file Dockerfile --tag your_username:mtcrnn ../
@@ -17,13 +17,13 @@
 4. Back in the RNN project directory, fire up your docker container:
 
    ```bash
-   docker run --ipc=host --gpus "device=0" -it -v $(pwd):/MTCRNN.Fork -v /scratch/syntex/DS_TokWotalDuet_2.0:/mydata your_username:mtcrnn
+   docker run --ipc=host --gpus "device=0" -it -v $(pwd):/MTCRNN.Fork -v /scratch/QuickStart/RegularPopsRandomPitch_16k:/mydata your_username:mtcrnn
    ```
 
-5. Edit runscripts/quickstart.docker.run_tg.sh to run just a couple of steps if you just want to check. Then:
+5. Edit runscripts/quickstart.docker.run_tg.sh to run just a couple of steps if you just want to check for runability . Then:
 
    ```
-   chmod +x runscripts/quickstart.docker.run_tg.sh
+   chmod +x runscripts/quickstart.docker.pops.run_tg.sh
    ```
 
 6. Train:
@@ -32,15 +32,22 @@
    runscripts/quickstart.docker.run -t
    ```
 
-7. Create an array of conditioning parameter values to drive the RNN during generation using genParam/quickstart.ipynb. Put the generated .npy file in getParams/run/QuickStart (because this is where the runscript is set to look).
+7. Create an array of conditioning parameter values to drive the RNN during generation using genParam/quickstart.ipynb. Put the generated .npy file in getParams/run/QuickStart_pops (because this is where the runscript is set to look). 
 
-8.   Generate:
+8. Generate:
 
    ```
    runscripts/quickstart.docker.run -g
    ```
 
-   <hr>
+
+
+
+Check out more texture datasets from [syntex.sonicthings.org](). 
+
+They can all use the paramManager metadata file format that this code uses for data loading.
+
+<hr>
 
 # Multi-tier Conditional RNN
 

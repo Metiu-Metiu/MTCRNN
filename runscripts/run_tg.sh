@@ -62,7 +62,7 @@ then
 
 	python3 train.py --hidden_size $LAYERSIZE --batch_size $BATCHSIZE --param_dir $DATAPATH/$DATAFOLDER \
 	--prop $PROP --cond_size $cond_size --n_layers $NLAYERS --seq_len $SEQ_LEN --gen_size 1 --output_dir $MODELDIR \
-	--data_dir $DATAPATH/$DATAFOLDER --num_steps $NUMSTEPS --checkpoint $CHKPOINT \
+	--data_dir $DATAPATH/$DATAFOLDER --num_steps $NUMSTEPS --rand_prime --checkpoint $CHKPOINT \
 	--tfr $TFR 
 
 	# --model_dir $CHECKPOINTDIR --step $CHECKPOINTSTEP  #################   For continuing from checkpoint

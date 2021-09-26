@@ -1,5 +1,6 @@
 # docker image build --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) --file Dockerfile --tag lonce:mtcrnn ../
-FROM nvcr.io/nvidia/pytorch:20.12-py3
+#FROM nvcr.io/nvidia/pytorch:20.12-py3
+FROM nvcr.io/nvidia/pytorch:21.08-py3
 
 # create a project directory inside user home
 ENV PROJECT_DIR /working
