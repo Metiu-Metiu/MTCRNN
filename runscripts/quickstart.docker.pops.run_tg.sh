@@ -38,8 +38,8 @@ SEQ_LEN=256
 TFR=0.9
 BATCHSIZE=128
 
-NUMSTEPS=12000
-CHKPOINT=3000
+NUMSTEPS=6 #12000
+CHKPOINT=2 #3000
 
 # MODELDIR:  The ORIGINAL training MODELDIR date
 	# -  set manually if running from checkpoint or generating without training 
@@ -88,7 +88,7 @@ then
 	let OUTSEQ_LEN=$LEN+1    #duration of output in samples (including the seed)
 
 	#GENSTEPS must be in the collection of checkpointed models (that include the number in their filenames).
-	GENSTEPS="3000 6000 9000 12000" 
+	GENSTEPS="2 6" #"3000 6000 9000 12000" 
 
 	# the reference
 	let ESR=1000/$SECS       #the sample rate of the parameter array (original was 1000 samples in 1 sec)

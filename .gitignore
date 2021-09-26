@@ -5,7 +5,6 @@ __pycache__
 /output
 output/
 /data
-/paramManager
 codetest.ipynb
 .ipynb_checkpoints/
 *.wav
