@@ -42,8 +42,6 @@
 
    <hr>
 
-
-
 # Multi-tier Conditional RNN
 
 A generative model for audio that is driven by conditioning at different timescales.  
