@@ -14,22 +14,22 @@
    docker image build --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) --file Dockerfile --tag your_username:mtcrnn ../
    ```
 
-4. Back in the RNN project directory, fire up your docker container:
-
-   ```bash
-   docker run --ipc=host --gpus "device=0" -it -v $(pwd):/MTCRNN.Fork -v /scratch/QuickStart/RegularPopsRandomPitch_16k:/mydata your_username:mtcrnn
-   ```
-
-5. Edit runscripts/quickstart.docker.run_tg.sh to run just a couple of steps if you just want to check for runability . Then:
+4. Back in the RNN project directory, edit runscripts/quickstart.docker.run_tg.sh to run just a couple of steps if you just want to check for runability . Then:
 
    ```
    chmod +x runscripts/quickstart.docker.pops.run_tg.sh
    ```
 
+5. Fire up your docker container:
+
+   ```bash
+   docker run --ipc=host --gpus "device=0" -it --name quickstart -v $(pwd):/MTCRNN.Fork -v /scratch/QuickStart:/mydata your_username:mtcrnn
+   ```
+
 6. Train:
 
    ```
-   runscripts/quickstart.docker.run -t
+   runscripts/quickstart.docker.pops.run_tg.sh -t
    ```
 
 7. Create an array of conditioning parameter values to drive the RNN during generation using genParam/quickstart.ipynb. Put the generated .npy file in getParams/run/QuickStart_pops (because this is where the runscript is set to look). 
@@ -40,7 +40,9 @@
    runscripts/quickstart.docker.run -g
    ```
 
+Note: The quick start example uses a single 'tier' RNN that learns to generate the sample-by-sample audio.
 
+<hr>
 
 
 Check out more texture datasets from [syntex.sonicthings.org](). 
@@ -91,9 +93,12 @@ Each tier is an individual model that is trained independently. First decide whi
 List the generation parameters under **generate** and the corresponding number of input channels as **gen_size**. List the conditioning parameters under **prop** and the corresponding number of channels as **cond_size**. Specify the **sample_rate** for the tier. **data_dir** and **param_dir** point to the directory containing the data files and parameter files respectively. Models will be saved in **output_dir**. Please consult config file for more options and the below for some recipes to get started. 
 
 ## Training
+![](figures/mtcrnn_training.png)
+
 **Training frame-level tier (parameters only)**  
 For the below teacher forcing rate (TFR) is held constant at 0.5 throughout training duration.  
 Tier 3:    
+
 ```bash
 python3 train.py --hidden_size 300 --batch_size 16 --data_dir data/audio --param_dir data/param --generate rmse centroid pitch --prop fill --gen_size 3 --cond_size 1 --output_dir tier3  --sample_rate 125 --seq_len 1000 --num_steps 4000 --checkpoint 1000 --tfr 0.5
 ```
@@ -126,7 +131,10 @@ python3 train.py --hidden_size 300 --batch_size 16 --data_dir data/audio --param
 ```
 
 ## Generate
+![](figures/mtcrnn_generation.png)
+
 Generation has 3 modes of conditioning given by **paramvect** option:  
+
 * *self* (default): taken from priming data file  
 * *external*: manually provide a numpy array of shape [batch,length,features]  
 * *none*: no conditioning    
