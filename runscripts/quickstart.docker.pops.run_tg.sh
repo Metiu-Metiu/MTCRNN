@@ -26,24 +26,24 @@ echo "GENERATING = $GENERATING, TRAINING=$TRAINING"
 ##################################################################################################
 ######   COMMON PARAMS  (training and generating)  ########
 ##################################################################################################
-PROP="hitratio wmratio rate_exp"  #pitch, instID  - must correspond to names in the param files in the DATAFOLDER
+PROP="rate" # "normPitch instID"  #pitch, instID  - must correspond to names in the param files
 cond_size=`echo $PROP | wc -w`
 echo "cond_size is $cond_size"
 DATAPATH="/mydata"  # parent of DATAFOLDER (If using docker, must match the name of the volume you created with -v flag to docker)   
-DATAFOLDER="tokwotal_dataset" #name of folder in DATAPATH where sounds and parameters are
+DATAFOLDER="RegularPopsRandomPitch_16k" #name of folder in DATAPATH where sounds and parameters reside
 
 NLAYERS=4
 LAYERSIZE=256
-SEQ_LEN=512
+SEQ_LEN=256
 TFR=0.9
-BATCHSIZE=128
+BATCHSIZE=64
 
-NUMSTEPS=40000
-CHKPOINT=10000
+NUMSTEPS=30000
+CHKPOINT=3000
 
 # MODELDIR:  The ORIGINAL training MODELDIR date
 	# -  set manually if running from checkpoint or generating without training 
-DATESTAMP=`date +%Y.%m.%d`   # 2021.09.21 
+DATESTAMP=`date +%Y.%m.%d`
 MODELDIR=${DATESTAMP}_${DATAFOLDER}"_NL${NLAYERS}.H${LAYERSIZE}.TFR.${TFR}.SL${SEQ_LEN}.BATCHSIZE${BATCHSIZE}"
 
 
@@ -80,15 +80,15 @@ then
 	#--------------------------------------------------------------------------------------------------------
 	# Now the generator-specific parameters
 
-	DESCRIPTION="QuickStart_tokwotal"  # used for output directory and where to look for external conditioning parameter files
+	DESCRIPTION="QuickStart_pops"
 
 	let SR=16000             #output sample rate
-	let SECS=4    	    		 #duration of output in seconds
+	let SECS=10    	    		 #duration of output in seconds
 	let LEN=$SECS*$SR        #duration of output in samples
 	let OUTSEQ_LEN=$LEN+1    #duration of output in samples (including the seed)
 
 	#GENSTEPS must be in the collection of checkpointed models (that include the number in their filenames).
-	GENSTEPS="30000 40000"  #"10000 20000 30000 40000" 
+	GENSTEPS="3000 9000 15000 30000" 
 
 	# the reference
 	let ESR=1000/$SECS       #the sample rate of the parameter array (original was 1000 samples in 1 sec)
@@ -107,7 +107,7 @@ then
 
 
 	# directory of parameter files for this run (npy files, see notebooks in genParams)
-	for FILE in genParams/run/${DESCRIPTION}/* 
+	for FILE in genParams/run/${DESCRIPTION}/*  
 	do 
 		# An npy file with a (cond_size * sample points) array of parameter values to use for synthesis
 		CPDIR=$FILE

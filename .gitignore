@@ -3,11 +3,11 @@ __pycache__
 .cache
 .idea
 /output
-/output/*
+output/
 /data
 /paramManager
 codetest.ipynb
-.ipynb_checkpoints/*
+.ipynb_checkpoints/
 *.wav
 *.txt
 /figures
