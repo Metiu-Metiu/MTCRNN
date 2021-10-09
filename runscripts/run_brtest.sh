@@ -26,11 +26,11 @@ echo "GENERATING = $GENERATING, TRAINING=$TRAINING"
 ##################################################################################################
 ######   COMMON PARAMS  (training and generating)  ########
 ##################################################################################################
-PROP="hitratio wmratio rate_exp"  #pitch, instID  - must correspond to names in the param files in the DATAFOLDER
+PROP="d0 d1"  #pitch, instID  - must correspond to names in the param files in the DATAFOLDER
 cond_size=`echo $PROP | wc -w`
 echo "cond_size is $cond_size"
 DATAPATH="/mydata"  # parent of DATAFOLDER (If using docker, must match the name of the volume you created with -v flag to docker)   
-DATAFOLDER="tokwotal_dataset" #name of folder in DATAPATH where sounds and parameters are
+DATAFOLDER="boreillyGMvariations" #name of folder in DATAPATH where sounds and parameters are
 
 NLAYERS=4
 LAYERSIZE=256
@@ -38,7 +38,7 @@ SEQ_LEN=512
 TFR=0.9
 BATCHSIZE=128
 
-NUMSTEPS=120000
+NUMSTEPS=100000
 CHKPOINT=20000
 
 # MODELDIR:  The ORIGINAL training MODELDIR date
@@ -127,7 +127,8 @@ then
 			--data_dir $DATAPATH/$DATAFOLDER --generate audio --prop $PROP --cond_size $cond_size --gen_size 1 --model_dir output/$MODELDIR/model \
 			--step $STEP --paramvect external --sample_rate $SR --external_array $CPDIR \
 			--external_sr $ESR --out $AUDIO_OUT \
-			--rand_prime  --save
+			--rand_prime \
+			--save
 
 			# --rand_prime \ 
 				#play $AUDIO_OUT.wav
