@@ -2,26 +2,59 @@
 # This script is for generating audio from the RNN using on a directory of  "Control Parameter" files
 # This script will be copied and saved in both training and audio generation directories
 
+echo "script args : " $@
+
 if [ $# -eq 0 ]
   then
-    echo "usage: run_tg [-g -t] for generate and/or train"
+    echo "usage: run_tg [-g|-t] for generate and/or train, optional: -d datadir -n numsteps -c checkpoints -s datestamp"
     exit -1
 fi
 
 GENERATING=0   # set to true with -g flag
 TRAINING=0     # set to true with -t flag
+DATAPATH="/mydata"  # parent of DATAFOLDER (If using docker, must match the name of the volume you created with -v flag to docker); Can be overridden with the -d otption, too
 
-while getopts “::gt” opt; do
+NUMSTEPS=30 #12000
+CHKPOINT=$NUMSTEPS #3000
+
+# MODELDIR:  The ORIGINAL training MODELDIR date
+	# -  set with input arg if running from checkpoint or generating without training 
+DATESTAMP=`date +%Y.%m.%d`
+
+while getopts “gtd:n:c:s:” opt; do
   case $opt in
-    g) 
+	g) 
 		GENERATING=1 
 		;;
 	t) 
-		TRAINING=1  
+		TRAINING=1 
 		;;
-  esac
+	d) 
+		DATAPATH=${OPTARG} 
+		;;
+	n) 
+		NUMSTEPS=${OPTARG} 
+		;;
+	c) 
+		CHKPOINT=${OPTARG} 
+		;;
+	s) 
+		DATESTAMP=${OPTARG} 
+		;;
+
+	  esac
 done
-echo "GENERATING = $GENERATING, TRAINING=$TRAINING"
+
+if (( $CHKPOINT > $NUMSTEPS )) ; then
+    CHKPOINT=$NUMSTEPS 
+fi
+
+echo GENERATING=$GENERATING
+echo TRAINING=$TRAINING
+echo DATAPATH=$DATAPATH
+echo NUMSTEPS=$NUMSTEPS
+echo CHKPOINT=$CHKPOINT
+echo DATESTAMP=${DATESTAMP}
 
 ##################################################################################################
 ######   COMMON PARAMS  (training and generating)  ########
@@ -29,7 +62,7 @@ echo "GENERATING = $GENERATING, TRAINING=$TRAINING"
 PROP="rate" # "normPitch instID"  #pitch, instID  - must correspond to names in the param files
 cond_size=`echo $PROP | wc -w`
 echo "cond_size is $cond_size"
-DATAPATH="/mydata"  # parent of DATAFOLDER (If using docker, must match the name of the volume you created with -v flag to docker)   
+
 DATAFOLDER="RegularPopsRandomPitch_16k" #name of folder in DATAPATH where sounds and parameters reside
 
 NLAYERS=4
@@ -38,12 +71,8 @@ SEQ_LEN=256
 TFR=0.9
 BATCHSIZE=128
 
-NUMSTEPS=12000
-CHKPOINT=3000
 
-# MODELDIR:  The ORIGINAL training MODELDIR date
-	# -  set manually if running from checkpoint or generating without training 
-DATESTAMP=`date +%Y.%m.%d`
+
 MODELDIR=${DATESTAMP}_${DATAFOLDER}"_NL${NLAYERS}.H${LAYERSIZE}.TFR.${TFR}.SL${SEQ_LEN}.BATCHSIZE${BATCHSIZE}"
 
 
@@ -88,7 +117,12 @@ then
 	let OUTSEQ_LEN=$LEN+1    #duration of output in samples (including the seed)
 
 	#GENSTEPS must be in the collection of checkpointed models (that include the number in their filenames).
-	GENSTEPS="3000 6000 9000 12000" 
+	GENSTEPS=""
+	for (( c=CHKPOINT; c<=NUMSTEPS; c = c + CHKPOINT ))
+	do 
+		GENSTEPS+="${c} "
+	done
+	echo "GENSTEPS is  $GENSTEPS "
 
 	# the reference
 	let ESR=1000/$SECS       #the sample rate of the parameter array (original was 1000 samples in 1 sec)
@@ -101,8 +135,11 @@ then
 
 	#--------------------------------------------------------------------------------------------------------
 	echo  "will look for model here: $MODELDIR"
-	mkdir -p output/$MODELDIR/${DESCRIPTION}_$(date +%Y.%m.%d)/audio
-	GEN_OUT=output/$MODELDIR/${DESCRIPTION}_$(date +%Y.%m.%d)
+	# mkdir -p output/$MODELDIR/${DESCRIPTION}_$(date +%Y.%m.%d)/audio
+	# GEN_OUT=output/$MODELDIR/${DESCRIPTION}_$(date +%Y.%m.%d)
+	mkdir -p output/$MODELDIR/${DESCRIPTION}_${DATESTAMP}/audio
+	GEN_OUT=output/$MODELDIR/${DESCRIPTION}_${DATESTAMP}
+
 	cp "$0" $GEN_OUT  # copy this script output directory for posterity
 
 
